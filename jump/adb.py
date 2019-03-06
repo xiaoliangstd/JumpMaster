@@ -6,6 +6,7 @@ import subprocess as sub
 import shlex 
 import cv2 as cv 
 import numpy as np 
+import math
 
 
 class Adb:
@@ -20,14 +21,18 @@ class Adb:
         resize = cv.resize(img,(700,900))
         self.img = resize
         return self.img
-    
-    def touch(self,time):
-        sub.call("adb shell input touchscreen swipe 400 400 400 400 {}".format(time),shell = True)
+
+    def againtencent(self):
+        pass
+
+    def touch(self,x1,y1,time):
+        sub.call("adb shell input touchscreen swipe {} {} {} {} {}".format(x1,y1,x1,y1,time),shell = True)
 
 
 
 if __name__ == "__main__":
     adb = Adb()
     adb.screenshot()
+    adb.againtencent()
     cv.waitKey(0)
     cv.destroyAllWindows()
