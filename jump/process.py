@@ -16,7 +16,11 @@ class jumpmaster:
         bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             x,y,w,h = cv.boundingRect(cnt)
-            if (x+w)>50:
+            area = w*h
+            
+            if area>5000 and area < 5700: # area filter  
                 cv.rectangle(canvas,(x,y),(x+w,y+h),color = (0,0,255),thickness = 6)
+                print(w)
+                print(h)
                 #print("chess position is : x:{},y:{}".format(x+w/2,y+h))
-        return canvas,x+w/2,y+h
+                return canvas,x+w/2,y+h
