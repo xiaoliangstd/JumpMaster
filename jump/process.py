@@ -7,7 +7,7 @@ class jumpmaster:
 
     def __init__(self):
         self.roi = None
-
+        self.chess_pos = None
     def findChess(self,img,canvas):
         roi = img[300:600,:]
         self.roi = roi
@@ -16,18 +16,29 @@ class jumpmaster:
         dliate = cv.dilate(bin_img,kernel,iterations = 2)
         erode = cv.erode(dliate,kernel,iterations = 1)
         bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
+        cv.imshow("bin",bin_im)
         for cnt in contours:
             x,y,w,h = cv.boundingRect(cnt)
             area = w*h
             
             if area>4000 and area < 5700: # area filter  
                 cv.rectangle(canvas,(x,y),(x+w,y+h),color = (0,0,255),thickness = 6)
+                self.chess_pos = (x,y)
+                
+                
                 #print("chess position is : x:{},y:{}".format(x+w/2,y+h))
                 return canvas,x+w/2,y+h
 
     def findBox(self):
         stop = 0
         edges = cv.Canny(self.roi,100,200)
+        che_x,che_y = self.chess_pos
+        # x 
+        for s in range(che_y,che_y + 100):
+            # y
+            for d in range(che_x-20,che_x + 90):
+                edges[s][d] = 0
+        
         for r,i in enumerate(edges):
             for c,j in enumerate(i):
                 if j == 255:
@@ -35,29 +46,26 @@ class jumpmaster:
                     break
             if stop == 1: 
                 break
+        
         return r,c,self.roi
 
 if __name__ == "__main__":
     img_indx = 0
+    jum = jumpmaster()
     while True:
         stop = 0
-        
         img = cv.imread("../test_data/"+str(img_indx)+".png",-1)
-        resize = cv.resize(img,(700,900))
-        roi = resize[300:600,:]
+        canvas = np.copy(img)
+        jum.findChess(img,canvas)
+        jum.findBox()
+        
+        '''
         edges = cv.Canny(roi,100,200)
-        for r,i in enumerate(edges):
-            for c,j in enumerate(i):
-                if j == 255:
-                    print(r,c)
-                    stop = 1
-                    break 
-            if stop == 1:
-                break
         cv.circle(roi,(c,r),6,(0,0,255),-1)  # why?
         cv.circle(roi,(c,r+50),6,(0,0,255),-1)
         cv.imshow("roi",roi)
-        cv.imshow("edge",edges)   
+        cv.imshow("edge",edges)  
+        '''
         img_indx +=1         
         key_num = cv.waitKey(0)
         if key_num == ord("n"):
