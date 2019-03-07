@@ -3,12 +3,18 @@ import numpy as np
 lower = np.array([105,25,45])
 upper = np.array([135,125,130])
 kernel = np.ones((5,5),np.uint8)
+# use obj is a necessary way to code
+# do use 
+# api designe  and create api
 class jumpmaster:
 
     def __init__(self):
         self.roi = None
         self.chess_pos = None
-    def findChess(self,img,canvas):
+        self.box_pos = None
+        self.che_wh = None 
+        
+    def findChess(self,img):
         roi = img[300:600,:]
         self.roi = roi
         hsv = cv.cvtColor(roi,cv.COLOR_BGR2HSV)
@@ -16,18 +22,15 @@ class jumpmaster:
         dliate = cv.dilate(bin_img,kernel,iterations = 2)
         erode = cv.erode(dliate,kernel,iterations = 1)
         bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
-        cv.imshow("bin",bin_im)
         for cnt in contours:
             x,y,w,h = cv.boundingRect(cnt)
             area = w*h
             
             if area>4000 and area < 5700: # area filter  
-                cv.rectangle(canvas,(x,y),(x+w,y+h),color = (0,0,255),thickness = 6)
                 self.chess_pos = (x,y)
-                
-                
+                self.che_wh = (w,h)
                 #print("chess position is : x:{},y:{}".format(x+w/2,y+h))
-                return canvas,x+w/2,y+h
+                return x+w/2,y+h
 
     def findBox(self):
         stop = 0
@@ -46,8 +49,16 @@ class jumpmaster:
                     break
             if stop == 1: 
                 break
-        
-        return r,c,self.roi
+        self.box_pos = (r,c)
+        return r,c
+
+    def visual(self):
+        canvas = self.roi 
+        che_x,che_y = self.chess_pos
+        che_w,che_h = self.che_wh
+        box_y,box_x = self.box_pos
+        cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(box_x,box_y+50),(0,0,255),5)
+        cv.imshow("visual",canvas)
 
 if __name__ == "__main__":
     img_indx = 0

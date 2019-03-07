@@ -25,8 +25,12 @@ class Adb:
     def againtencent(self):
         pass
 
-    def touch(self,x1,y1,time):
-        sub.call("adb shell input touchscreen swipe {} {} {} {} {}".format(x1,y1,x1,y1,time),shell = True)
+    def touch(self,che_x,che_y,x,y):
+        x1 = np.random.randint(550,600)
+        y1 = np.random.randint(350,550)
+        time = math.sqrt(abs(che_x - y)**2 + abs(che_y - (x+50))**2)
+        cal_time = int(time*2.2)
+        sub.call("adb shell input touchscreen swipe {} {} {} {} {}".format(x1,y1,x1+20,y1+20,cal_time),shell = True)
 
 
 
