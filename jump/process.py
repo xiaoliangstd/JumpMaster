@@ -36,20 +36,44 @@ class jumpmaster:
         stop = 0
         edges = cv.Canny(self.roi,100,200)
         che_x,che_y = self.chess_pos
-        # x 
+        # find box pointe1 x1 
         for s in range(che_y,che_y + 100):
-            # y
+            # find box pointe1 y1
             for d in range(che_x-20,che_x + 90):
                 edges[s][d] = 0
-        
+        cv.imshow("edgess",edges)
         for r,i in enumerate(edges):
             for c,j in enumerate(i):
                 if j == 255:
                     stop = 1
+                    self.box_pos = (r,c)
                     break
             if stop == 1: 
                 break
-        self.box_pos = (r,c)
+        cv.circle(self.roi,(c,r),6,(0,0,255),-1)
+        # o is the array data    k is the number
+        for k,o in enumerate(edges[r+10]):
+            if o == 255:
+                #print("x2:",k,"y2:",r+10)
+                cv.circle(self.roi,(k,r+10),6,(0,0,255),-1)
+                break
+        # box pointe two
+        
+        for q,o in enumerate(edges[r+10][::-1]):
+            if o == 255:
+                
+                cv.circle(self.roi,(700-q,r+10),6,(0,0,255),-1)
+                break
+
+        '''
+        for q,o in enumerate(edges[r+20,k+10:]):
+            this_data = o
+            next_data = edges[r+10][q+1]
+            if (this_data == 255) and (next_data == 0):
+                cv.circle(self.roi,(k+q+10,r+10),6,(0,0,255),-1)
+                break
+        '''
+        cv.imshow('canvas2',self.roi)
         return r,c
 
     def visual(self):
@@ -61,14 +85,17 @@ class jumpmaster:
         cv.imshow("visual",canvas)
 
 if __name__ == "__main__":
+    # follow code use to test api
     img_indx = 0
     jum = jumpmaster()
     while True:
         stop = 0
         img = cv.imread("../test_data/"+str(img_indx)+".png",-1)
         canvas = np.copy(img)
-        jum.findChess(img,canvas)
-        jum.findBox()
+        jum.findChess(img)
+        r,c = jum.findBox()
+        cv.circle(canvas,(c,r+300),6,(255,0,0),-1)
+        cv.imshow("canvas",canvas)
         
         '''
         edges = cv.Canny(roi,100,200)
