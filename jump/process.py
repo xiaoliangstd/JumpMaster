@@ -13,8 +13,13 @@ class jumpmaster:
         self.chess_pos = None
         self.box_pos = None
         self.che_wh = None 
+        self.box1_pos = None
+        self.box2_pos = None
+        self.box3_pos = None
+        self.canvas = None
         
     def findChess(self,img):
+        self.canvas = img
         roi = img[300:600,:]
         self.roi = roi
         hsv = cv.cvtColor(roi,cv.COLOR_BGR2HSV)
@@ -64,7 +69,24 @@ class jumpmaster:
                 
                 cv.circle(self.roi,(700-q,r+10),6,(0,0,255),-1)
                 break
-
+        x1 = k 
+        x2 = 700-q
+        x3 = int((x2 - x1)/2)+k
+        y3 = r+30
+        x1 = k
+        y1 = r+10
+        x2 = 700-q
+        y2 = r+10
+        cv.line(self.roi,(c,r),(x1,r+10),(0,0,255),4)
+        cv.line(self.roi,(c,r),(x2,r+10),(0,0,255),4)
+        cv.line(self.roi,(x1,r+10),(x2,r+10),(0,0,255),4)
+        cv.circle(self.roi,(x3,y3),6,(0,0,255),-1)
+        cv.line(self.roi,(c,r),(x3,y3),(0,0,255),4)
+        self.box3_pos = x3,y3
+        self.box1_pos = k,y1
+        self.box2_pos = x2,y2
+        
+        #print("x1:",x1,"x2 :",x2,"mid: ",int((x2-x1)/2)+x1)
         '''
         for q,o in enumerate(edges[r+20,k+10:]):
             this_data = o
@@ -81,8 +103,11 @@ class jumpmaster:
         che_x,che_y = self.chess_pos
         che_w,che_h = self.che_wh
         box_y,box_x = self.box_pos
-        cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(box_x,box_y+50),(0,0,255),5)
+        x3,y3 = self.box3_pos
+        #cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(box_x,box_y+50),(0,0,255),5)
+        cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(x3,y3),(0,0,255),4)
         cv.imshow("visual",canvas)
+        cv.imshow("222",self.canvas)
 
 if __name__ == "__main__":
     # follow code use to test api
