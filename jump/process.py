@@ -57,29 +57,29 @@ class jumpmaster:
                 break
         cv.circle(self.roi,(c,r),6,(0,0,255),-1)
         # o is the array data    k is the number
-        for k,o in enumerate(edges[r+10]):
+        for k,o in enumerate(edges[r+20]):
             if o == 255:
                 #print("x2:",k,"y2:",r+10)
-                cv.circle(self.roi,(k,r+10),6,(0,0,255),-1)
+                cv.circle(self.roi,(k,r+20),6,(0,0,255),-1)
                 break
         # box pointe two
         
-        for q,o in enumerate(edges[r+10][::-1]):
+        for q,o in enumerate(edges[r+20][::-1]):
             if o == 255:
                 
-                cv.circle(self.roi,(700-q,r+10),6,(0,0,255),-1)
+                cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
                 break
         x1 = k 
         x2 = 700-q
         x3 = int((x2 - x1)/2)+k
-        y3 = r+30
+        y3 = r+45
         x1 = k
-        y1 = r+10
+        y1 = r+20
         x2 = 700-q
-        y2 = r+10
-        cv.line(self.roi,(c,r),(x1,r+10),(0,0,255),4)
-        cv.line(self.roi,(c,r),(x2,r+10),(0,0,255),4)
-        cv.line(self.roi,(x1,r+10),(x2,r+10),(0,0,255),4)
+        y2 = r+20
+        cv.line(self.roi,(c,r),(x1,y1),(0,0,255),4)
+        cv.line(self.roi,(c,r),(x2,y2),(0,0,255),4)
+        cv.line(self.roi,(x1,y1),(x2,y2),(0,0,255),4)
         cv.circle(self.roi,(x3,y3),6,(0,0,255),-1)
         cv.line(self.roi,(c,r),(x3,y3),(0,0,255),4)
         self.box3_pos = x3,y3
@@ -105,6 +105,7 @@ class jumpmaster:
         box_y,box_x = self.box_pos
         x3,y3 = self.box3_pos
         #cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(box_x,box_y+50),(0,0,255),5)
+        #consider why change self.roi and the canvas same
         cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(x3,y3),(0,0,255),4)
         cv.imshow("visual",canvas)
         cv.imshow("222",self.canvas)
