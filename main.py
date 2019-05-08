@@ -24,24 +24,16 @@ if __name__ == "__main__":
     adb = Adb()
     jmp = jumpmaster()
     while True: 
-        img = adb.screenshot()
-        canvas = np.copy(img[300:600,:])  
+        img = adb.screenshot()  
         try:
-            canvas,che_x,che_y = jmp.findChess(img,canvas)
-            x,y,canvas= jmp.findBox()
-            cv.circle(canvas,(y,x),6,(0,0,255),-1)
-
-            x1 = np.random.randint(550,600)
-            y1 = np.random.randint(350,550)
-            time = math.sqrt(abs(che_x - y)**2 + abs(che_y - (x+50))**2)
-            #print("distance : ",math.sqrt(abs(che_x - x)**2 + abs(che_y - y)**2))
-            cal_time = int(time*2.2)
-            adb.touch(x1,y1,cal_time)
-
+            che_x,che_y = jmp.findChess(img)
+            x,y = jmp.findBox()
+            jmp.visual()
+            cv.waitKey(500)
+            adb.touch(che_x,che_y,x,y)
+            
         except TypeError :
-            continue
-        cv.imshow("liang.png",canvas)
-        cv.setMouseCallback("liang.png",mouse_val) 
+            continue 
         cv.waitKey(800)    
         
     cv.destroyAllWindows()
