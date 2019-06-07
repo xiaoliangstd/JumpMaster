@@ -1,11 +1,14 @@
 import cv2 as cv 
-import numpy as np 
-lower = np.array([105,25,45])
+import numpy as np
+
+# HSV 颜色空间下棋子轮廓阈值 
+lower = np.array([105,25,45])  
 upper = np.array([135,125,130])
-kernel = np.ones((5,5),np.uint8)
-# use obj is a necessary way to code
-# do use 
-# api designe  and create api
+# HSV 颜色空间下棋子轮廓阈值 
+
+kernel = np.ones((5,5),np.uint8) # 膨胀 腐蚀 操作的卷积核
+
+
 class jumpmaster:
 
     def __init__(self):   # 设置全局变量
@@ -31,23 +34,23 @@ class jumpmaster:
             x,y,w,h = cv.boundingRect(cnt) # 对轮廓分析 得到最大包围矩形信息 长 宽 高等坐标
             area = w*h
             if area>4000 and area < 5700: # 软件面积滤波 过滤调一些小的不是棋子的色块
-                self.chess_pos = (x,y)
-                self.che_wh = (w,h)
+                self.chess_pos = (x,y)  # 棋子的坐标位置  注意这里的位置的是从看的角度出发的 不是从数组的角度出发的 但是可视化时要转化成从数组的角度的
+                self.che_wh = (w,h)  # 棋子的高和宽
                 #print("chess position is : x:{},y:{}".format(x+w/2,y+h))  # 调试信息语句
-                return x+w/2,y+h  
+                return x+w/2,y+h  # 返回棋子底部中心坐标
 
-    def findBox(self): 
-        stop = 0
-        edges = cv.Canny(self.roi,100,200)
-        che_x,che_y = self.chess_pos
-        # find box pointe1 x1 
+    def findBox(self):  # 找到盒子的位置 自己发挥的 算法不好 有时候识别不到盒子
+        stop = 0  # 标志变量
+        edges = cv.Canny(self.roi,100,200)  # Canny 算子提取边缘
+        che_x,che_y = self.chess_pos  # 根据棋子的位置将它周围的像素点设为0 因为通过观察有时候棋子的位置会超过盒子 造成识别错误
         for s in range(che_y,che_y + 100):
             # find box pointe1 y1
             for d in range(che_x-20,che_x + 90):
-                edges[s][d] = 0
-        cv.imshow("edgess",edges)
-        for r,i in enumerate(edges):
-            for c,j in enumerate(i):
+                edges[s][d] = 0 # 将棋子周围像素点设为0 避免下一步的识别盒子
+        cv.imshow("edgess",edges) # 调试图片
+
+        for r,i in enumerate(edges):  # 遍历盒子二值轮廓图像 找到盒子最顶点
+            for c,j in enumerate(i):  
                 if j == 255:
                     stop = 1
                     self.box_pos = (r,c)
@@ -55,6 +58,7 @@ class jumpmaster:
             if stop == 1: 
                 break
         cv.circle(self.roi,(c,r),6,(0,0,255),-1)
+
         # o is the array data    k is the number
         for k,o in enumerate(edges[r+20]):
             if o == 255:
@@ -68,6 +72,8 @@ class jumpmaster:
                 
                 cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
                 break
+
+
         x1 = k 
         x2 = 700-q
         x3 = int((x2 - x1)/2)+k
@@ -97,7 +103,7 @@ class jumpmaster:
         cv.imshow('canvas2',self.roi)
         return r,c
 
-    def visual(self):
+    def visual(self):     # 专门用来可视化操作的成员函数
         canvas = self.roi 
         che_x,che_y = self.chess_pos
         che_w,che_h = self.che_wh
