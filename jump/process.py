@@ -69,7 +69,6 @@ class jumpmaster:
         
         for q,o in enumerate(edges[r+20][::-1]):
             if o == 255:
-                
                 cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
                 break
 
@@ -90,16 +89,7 @@ class jumpmaster:
         self.box3_pos = x3,y3
         self.box1_pos = k,y1
         self.box2_pos = x2,y2
-        
         #print("x1:",x1,"x2 :",x2,"mid: ",int((x2-x1)/2)+x1)
-        '''
-        for q,o in enumerate(edges[r+20,k+10:]):
-            this_data = o
-            next_data = edges[r+10][q+1]
-            if (this_data == 255) and (next_data == 0):
-                cv.circle(self.roi,(k+q+10,r+10),6,(0,0,255),-1)
-                break
-        '''
         cv.imshow('canvas2',self.roi)
         return r,c
 
