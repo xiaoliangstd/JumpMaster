@@ -4,8 +4,7 @@ import cv2 as cv
 import numpy as np 
 import math
 import time
-# mouse like interrupt
-# global value  in control stament
+
 mx = 0
 my = 0
 ratio = 0.5
@@ -24,7 +23,7 @@ if __name__ == "__main__":
     adb = Adb()
     jmp = jumpmaster()
     while True: 
-        img = adb.screenshot()  
+        img = adb.screenshot()   # 发送ADB指令截图 
         try:
             che_x,che_y = jmp.findChess(img)
             x,y = jmp.findBox()

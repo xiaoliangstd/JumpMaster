@@ -8,36 +8,35 @@ kernel = np.ones((5,5),np.uint8)
 # api designe  and create api
 class jumpmaster:
 
-    def __init__(self):
-        self.roi = None
-        self.chess_pos = None
-        self.box_pos = None
+    def __init__(self):   # 设置全局变量
+        self.roi = None   # 保存ROI图像变量
+        self.chess_pos = None  # 保存棋子位置变量
+        self.box_pos = None   # 保存盒子位置变量
         self.che_wh = None 
         self.box1_pos = None
         self.box2_pos = None
         self.box3_pos = None
-        self.canvas = None
+        self.canvas = None  # 画布
         
-    def findChess(self,img):
-        self.canvas = img
-        roi = img[300:600,:]
-        self.roi = roi
-        hsv = cv.cvtColor(roi,cv.COLOR_BGR2HSV)
-        bin_img = cv.inRange(hsv,lower,upper)
-        dliate = cv.dilate(bin_img,kernel,iterations = 2)
-        erode = cv.erode(dliate,kernel,iterations = 1)
-        bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
+    def findChess(self,img): # 注释规范 ：  操作名称  +  操作作用
+        self.canvas = img  # 复制图像到画布 因为添加
+        roi = img[300:600,:] # 截取ROI图像 作为主要分析对象
+        self.roi = roi  # 将ROI图像作为全局变量 方便其他函数的使用
+        hsv = cv.cvtColor(roi,cv.COLOR_BGR2HSV) # 转换颜色空间 BGR TO HSV
+        bin_img = cv.inRange(hsv,lower,upper) # 阈值分割 因棋子颜色在游戏运行中稳定 采用阈值分割 跟踪棋子
+        dliate = cv.dilate(bin_img,kernel,iterations = 2) # 膨胀 将图像膨胀 使得棋子头部和下体连在一起 后面的FindContours函数要用
+        erode = cv.erode(dliate,kernel,iterations = 1) # 腐蚀 能够消除二值分割时的图像噪点 得到干净的轮廓图像 使用技巧吧这是
+        bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE) # 寻找轮廓 如果前面得到干净的二值轮廓 那现在轮廓就只有棋子了
         for cnt in contours:
-            x,y,w,h = cv.boundingRect(cnt)
+            x,y,w,h = cv.boundingRect(cnt) # 对轮廓分析 得到最大包围矩形信息 长 宽 高等坐标
             area = w*h
-            
-            if area>4000 and area < 5700: # area filter  
+            if area>4000 and area < 5700: # 软件面积滤波 过滤调一些小的不是棋子的色块
                 self.chess_pos = (x,y)
                 self.che_wh = (w,h)
-                #print("chess position is : x:{},y:{}".format(x+w/2,y+h))
-                return x+w/2,y+h
+                #print("chess position is : x:{},y:{}".format(x+w/2,y+h))  # 调试信息语句
+                return x+w/2,y+h  
 
-    def findBox(self):
+    def findBox(self): 
         stop = 0
         edges = cv.Canny(self.roi,100,200)
         che_x,che_y = self.chess_pos
