@@ -1,6 +1,17 @@
 import cv2 as cv 
 import numpy as np
 
+"""
+识别盒子的程序有待优化   现在的程序如果是出现 盒子颜色和背景差不多 就没有用了
+使用的是canny 
+
+下一步计划使用 自适应阈值
+             或者 二值与或非 把背景 先通过 直方图分析 然后二值与或非 进行 去除背景
+             再进行分析
+
+"""
+
+
 # HSV 颜色空间下棋子轮廓阈值 
 lower = np.array([105,25,45])  
 upper = np.array([135,125,130])
@@ -72,7 +83,7 @@ class jumpmaster:
                 cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
                 break
 
-
+        # 可视化操作  需要修改
         x1 = k 
         x2 = 700-q
         x3 = int((x2 - x1)/2)+k
