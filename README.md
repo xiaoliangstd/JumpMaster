@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # JumpMaster
 
 
@@ -10,3 +11,10 @@ jumpmaster 是主要的类   adb是和安卓手机通信的类
 这个参考了一些别人的代码，融合了自己的想法
 通过这个小小项目，可以习得视觉任务处理分析能力和视觉基本的业务逻辑能力。
 
+=======
+ # JumpMaster
+
+来自渣渣视觉小新的小试牛刀，写的不好，见笑了。
+
+From the slag visual first test knife, writing is not good, laughed.  --来自于百度翻译
+>>>>>>> dcf0ded476bd9b87d11127afb28939e846f28994
