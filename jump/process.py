@@ -3,22 +3,16 @@ import numpy as np
 
 """
 识别盒子的程序有待优化   现在的程序如果是出现 盒子颜色和背景差不多 就没有用了
-使用的是canny 
-
-下一步计划使用 自适应阈值
-             或者 二值与或非 把背景 先通过 直方图分析 然后二值与或非 进行 去除背景
-             再进行分析
 
 """
+
 
 
 # HSV 颜色空间下棋子轮廓阈值 
 lower = np.array([105,25,45])  
 upper = np.array([135,125,130])
 # HSV 颜色空间下棋子轮廓阈值 
-
 kernel = np.ones((5,5),np.uint8) # 膨胀 腐蚀 操作的卷积核
-
 
 class jumpmaster:
 
@@ -27,20 +21,70 @@ class jumpmaster:
         self.chess_pos = None  # 保存棋子位置变量
         self.box_pos = None   # 保存盒子位置变量
         self.che_wh = None 
+        self.box_mask = None
         self.box1_pos = None
         self.box2_pos = None
         self.box3_pos = None
         self.canvas = None  # 画布
+
+    def cal_singlechannel_mask(self,img,channel):
         
+        hist_img = cv.calcHist([img],[channel],None,[256],[0,255])
+        hist_img = np.array(hist_img)
+        shang_data = 0
+        right_data = 0
+        for index,value in enumerate(hist_img):
+            right_data = value
+            if(shang_data == 0 and  right_data != 0):
+                down = index
+            if(right_data == 0 and shang_data != 0):
+                up = index
+            shang_data = right_data
+
+        return down,up
+    
+    def cal_mask(self,img,channel):
+
+        hist_img = cv.calcHist([img],[channel],None,[256],[0,255])
+        hist_img = np.array(hist_img)
+        shang_data = 0
+        right_data = 0
+        for index,value in enumerate(hist_img):
+            right_data = value
+            if(shang_data == 0 and  right_data != 0):
+                down = index
+            if(right_data == 0 and shang_data != 0):
+                up = index
+            shang_data = right_data
+
+        return down,up
+
+    def preprocess(self,img):
+
+        img_roi = img[200:540,695:700]  # 截取的roi 用作分析直方图
+        #cv.imshow("img_ro2",img_ro2)
+        (b_down,b_up) = self.cal_mask(img_roi,0)
+        (g_down,g_up) = self.cal_mask(img_roi,1)
+        (r_down,r_up) = self.cal_mask(img_roi,2)
+        upper = np.array([b_up,g_up,r_up]) 
+        downer = np.array([b_down-5,g_down-5,r_down-5]) 
+        img_bin = cv.inRange(img,downer,upper)
+        img_bin = cv.bitwise_not(img_bin)
+        img_bin = cv.cvtColor(img_bin,cv.COLOR_GRAY2BGR)
+        img = cv.bitwise_and(img,img_bin)
+        return img
+
+
     def findChess(self,img): # 注释规范 ：  操作名称  +  操作作用
         self.canvas = img  # 复制图像到画布 因为添加
+        img = self.preprocess(img)
         roi = img[300:600,:] # 截取ROI图像 作为主要分析对象
         self.roi = roi  # 将ROI图像作为全局变量 方便其他函数的使用
         hsv = cv.cvtColor(roi,cv.COLOR_BGR2HSV) # 转换颜色空间 BGR TO HSV
         bin_img = cv.inRange(hsv,lower,upper) # 阈值分割 因棋子颜色在游戏运行中稳定 采用阈值分割 跟踪棋子
         dliate = cv.dilate(bin_img,kernel,iterations = 2) # 膨胀 将图像膨胀 使得棋子头部和下体连在一起 后面的FindContours函数要用
         erode = cv.erode(dliate,kernel,iterations = 1) # 腐蚀 能够消除二值分割时的图像噪点 得到干净的轮廓图像 使用技巧吧这是
-        bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE) # 寻找轮廓 如果前面得到干净的二值轮廓 那现在轮廓就只有棋子了
+        contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE) # 寻找轮廓 如果前面得到干净的二值轮廓 那现在轮廓就只有棋子了
         for cnt in contours:
             x,y,w,h = cv.boundingRect(cnt) # 对轮廓分析 得到最大包围矩形信息 长 宽 高等坐标
             area = w*h
@@ -52,13 +96,14 @@ class jumpmaster:
 
     def findBox(self):  # 找到盒子的位置 自己发挥的 算法不好 有时候识别不到盒子
         stop = 0  # 标志变量
+        #cv.imshow("self.roi",self.roi)
         edges = cv.Canny(self.roi,100,200)  # Canny 算子提取边缘
         che_x,che_y = self.chess_pos  # 根据棋子的位置将它周围的像素点设为0 因为通过观察有时候棋子的位置会超过盒子 造成识别错误
         for s in range(che_y,che_y + 100):
             # find box pointe1 y1
             for d in range(che_x-20,che_x + 90):
                 edges[s][d] = 0 # 将棋子周围像素点设为0 避免下一步的识别盒子
-        cv.imshow("edgess",edges) # 调试图片
+        #cv.imshow("edgess",edges) # 调试图片
 
         for r,i in enumerate(edges):  # 遍历盒子二值轮廓图像 找到盒子最顶点
             for c,j in enumerate(i):  
@@ -82,7 +127,7 @@ class jumpmaster:
             if o == 255:
                 cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
                 break
-
+        # 倒序遍历
         # 可视化操作  需要修改
         x1 = k 
         x2 = 700-q
@@ -101,7 +146,7 @@ class jumpmaster:
         self.box1_pos = k,y1
         self.box2_pos = x2,y2
         #print("x1:",x1,"x2 :",x2,"mid: ",int((x2-x1)/2)+x1)
-        cv.imshow('canvas2',self.roi)
+        #cv.imshow('canvas2',self.roi)
         return r,c
 
     def visual(self):     # 专门用来可视化操作的成员函数
@@ -122,7 +167,7 @@ if __name__ == "__main__":
     jum = jumpmaster()
     while True:
         stop = 0
-        img = cv.imread("../test_data/"+str(img_indx)+".png",-1)
+        img = cv.imread("../test_data/"+str(img_indx)+".png",1)
         canvas = np.copy(img)
         jum.findChess(img)
         r,c = jum.findBox()
