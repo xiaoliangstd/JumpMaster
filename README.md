@@ -1,4 +1,3 @@
  # JumpMaster
 
-process.py 是核心处理文件
-main.py 是入口文件
+learn branch 是最新的代码分支 最新的代码在那里
