@@ -39,13 +39,14 @@ if __name__ == "__main__":
         img_bin = cv.cvtColor(img_bin,cv.COLOR_GRAY2BGR)
         img = cv.bitwise_and(img,img_bin)
         cv.imshow("img",img)
-        if cv.waitKey(0) == ord("n"):
+        key_num = cv.waitKey(0)
+        if key_num == ord("n"):
             a += 1
             continue
-        if cv.waitKey(0) == ord("m"):
+        if key_num == ord("m"):
             a -= 1
             continue
-        if cv.waitKey(0) == ord("s"):
+        if key_num == ord("s"):
             break
 
     cv.waitKey(0)
