@@ -15,7 +15,6 @@ class Adb:
         sub.call("adb shell screencap -p | sed 's/\r$//' > liang.png",shell = True)
         img = cv.imread("liang.png",1)
         resize = cv.resize(img,(700,900))
-        print("working")
         self.img = resize
         
         return self.img
