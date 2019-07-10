@@ -1,6 +1,6 @@
 import cv2 as cv 
 import numpy as np
-
+import math
 # HSV 颜色空间下棋子轮廓阈值 
 lower = np.array([105,25,45])  
 upper = np.array([135,125,130])
@@ -141,9 +141,11 @@ class jumpmaster:
        
         midx = int((rightx - leftx)/2)+leftx
         midy = int((righty - lefty)/2)+lefty
+        
+        # yyyy= math.sqrt((midx-topx)**2+(midy-topy)**2) # 不做过多运算 算了
 
-        bottomx =   midx
-        bottomy =  (midy-topy)+midy
+        bottomx =   (midx-topx)+midx
+        bottomy =   (midy-topy)+midy
         
         cv.circle(canvas,(topx,topy),6,(0,0,255),-1)
         cv.circle(canvas,(leftx,lefty),6,(0,0,255),-1)
@@ -151,18 +153,15 @@ class jumpmaster:
         cv.circle(canvas,(midx,midy),6,(0,0,255),-1)
         cv.circle(canvas,(bottomx,bottomy),6,(0,0,255),-1)
 
+        cv.line(canvas,(topx,topy),(leftx,lefty),(0,0,255),4)
+        cv.line(canvas,(topx,topy),(rightx,righty),(0,0,255),4)
+        cv.line(canvas,(topx,topy),(midx,midy),(0,0,255),4)
+        cv.line(canvas,(leftx,lefty),(rightx,righty),(0,0,255),4)
+        cv.line(canvas,(midx,midy),(bottomx,bottomy),(0,0,255),4)
+        cv.line(canvas,(leftx,lefty),(bottomx,bottomy),(0,0,255),4)
+        cv.line(canvas,(rightx,righty),(bottomx,bottomy),(0,0,255),4)
         cv.imshow('canvas2',canvas)
         
-        '''
-        cv.line(self.roi,(c,r),(x1,y1),(0,0,255),4)
-        cv.line(self.roi,(c,r),(x2,y2),(0,0,255),4)
-        cv.line(self.roi,(x1,y1),(x2,y2),(0,0,255),4)
-        cv.circle(self.roi,(x3,y3),6,(0,0,255),-1)
-        cv.line(self.roi,(c,r),(x3,y3),(0,0,255),4)
-        self.box3_pos = x3,y3
-        self.box1_pos = k,y1
-        self.box2_pos = x2,y2
-        '''
         #cv.imshow('canvas2',edges)
         return r,c
 
