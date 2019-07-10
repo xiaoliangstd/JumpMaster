@@ -17,7 +17,8 @@ class Adb:
     def screenshot(self):
         ''' get an image from android phone'''
         sub.call("adb shell screencap -p | sed 's/\r$//' > liang.png",shell = True)
-        img = cv.imread("liang.png",-1)
+        img = cv.imread("liang.png",1)
+        cv.imshow("img",img)
         resize = cv.resize(img,(700,900))
         self.img = resize
         return self.img
@@ -29,6 +30,7 @@ class Adb:
         x1 = np.random.randint(550,600)
         y1 = np.random.randint(350,550)
         time = math.sqrt(abs(che_x - y)**2 + abs(che_y - (x+40))**2)
+        print(time)
         cal_time = int(time*2.2)
         sub.call("adb shell input touchscreen swipe {} {} {} {} {}".format(x1,y1,x1+20,y1+20,cal_time),shell = True)
 

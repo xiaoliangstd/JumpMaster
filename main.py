@@ -24,15 +24,11 @@ if __name__ == "__main__":
     jmp = jumpmaster()
     while True: 
         img = adb.screenshot()   # 发送ADB指令截图 
-        try:
-            che_x,che_y = jmp.findChess(img)
-            x,y = jmp.findBox()
-            jmp.visual()
-            cv.waitKey(500)
-            adb.touch(che_x,che_y,x,y)
-            
-        except TypeError :
-            continue 
+        che_x,che_y = jmp.findChess(img)
+        x,y = jmp.findBox()
+        jmp.visual()
+        cv.waitKey(500)
+        adb.touch(che_x,che_y,x,y)
         cv.waitKey(800)    
         
     cv.destroyAllWindows()
