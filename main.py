@@ -29,9 +29,12 @@ if __name__ == "__main__":
             x,y = jmp.findBox()
             jmp.visual()
             cv.waitKey(1000)
-            adb.touch(che_x,che_y,x,y)
+            adb.touch(che_x,che_y,x,y) 
         except TypeError :
+            print(TypeError)
+            cv.imwrite("error1.png",img)
             continue 
+
         cv.waitKey(1000)    
         
     cv.destroyAllWindows()

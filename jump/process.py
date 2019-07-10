@@ -52,7 +52,7 @@ class jumpmaster:
         return down,up
 
     def preprocess(self,img): # 预先处理分析游戏背景阈值 
-        img_roi = img[200:540,695:700]  # 截取的roi 用作分析直方图
+        img_roi = img[200:500,695:700]  # 截取的roi 用作分析直方图
         #cv.imshow("img_ro2",img_ro2)
         (b_down,b_up) = self.cal_mask(img_roi,0)
         (g_down,g_up) = self.cal_mask(img_roi,1)
