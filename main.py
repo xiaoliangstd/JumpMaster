@@ -28,11 +28,10 @@ if __name__ == "__main__":
             che_x,che_y = jmp.findChess(img)
             x,y = jmp.findBox()
             jmp.visual()
-            cv.waitKey(500)
+            cv.waitKey(1000)
             adb.touch(che_x,che_y,x,y)
-            
         except TypeError :
             continue 
-        cv.waitKey(800)    
+        cv.waitKey(1000)    
         
     cv.destroyAllWindows()

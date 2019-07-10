@@ -16,9 +16,11 @@ class jumpmaster:
         self.box_pos = None   # 保存盒子位置变量
         self.che_wh = None 
         self.box_mask = None
-        self.box1_pos = None
-        self.box2_pos = None
-        self.box3_pos = None
+        self.top_point = None
+        self.rightest_point = None
+        self.leftest_point = None
+        self.bottom_point = None
+        self.mid_point = None 
         self.canvas = None  # 画布
 
     def cal_singlechannel_mask(self,img,channel): # 计算单一通道颜色阈值
@@ -93,10 +95,10 @@ class jumpmaster:
         che_x,che_y = self.chess_pos  # 根据棋子的boundingRect将它周围的像素点设为0 因为通过观察有时候棋子的位置会超过盒子 造成识别错误
         for s in range(che_y,che_y + 100):
             # find box pointe1 y1
-            for d in range(che_x-20,che_x + 90):
+            for d in range(che_x-2,che_x + 50):
                 edges[s][d] = 0 # 将棋子周围像素点设为0 避免下一步的识别盒子
         #cv.imshow("edgess",edges) # 调试图片
-
+        cv.imshow("edges",edges)
         for r,i in enumerate(edges):  # 遍历盒子二值轮廓图像 找到盒子最顶点
             for c,j in enumerate(i):  
                 if j == 255:
@@ -115,6 +117,7 @@ class jumpmaster:
         for leftest_point in range(300-r):          #得到在顶点往下还有多少行
             for k,o in enumerate(edges[r+leftest_point]): #遍历整个图像 寻找最左点 据观察 盒子的像素点都是一点一点的
                 if o == 255:
+                    #edges[r+leftest_point+1,k-1] = 255
                     now = k
                     break  
             if now >= last: 
@@ -139,19 +142,42 @@ class jumpmaster:
                 break
             last = now  
        
-        midx = int((rightx - leftx)/2)+leftx
-        midy = int((righty - lefty)/2)+lefty
+
+        if (leftx > topx) and (rightx >topx) :     # 都在右边
+            midx = topx 
+            midy = righty
+
+        if (leftx < topx) and (rightx > topx) :
+            midx = int((rightx - leftx)/2)+leftx
+            midy = int((righty - lefty)/2)+lefty
+        
+        if( leftx < topx) and (rightx < topx) :
+            midx = topx 
+            midy = lefty
+
+        
         
         # yyyy= math.sqrt((midx-topx)**2+(midy-topy)**2) # 不做过多运算 算了
 
         bottomx =   (midx-topx)+midx
         bottomy =   (midy-topy)+midy
-        
-        cv.circle(canvas,(topx,topy),6,(0,0,255),-1)
-        cv.circle(canvas,(leftx,lefty),6,(0,0,255),-1)
-        cv.circle(canvas,(rightx,righty),6,(0,0,255),-1)
-        cv.circle(canvas,(midx,midy),6,(0,0,255),-1)
-        cv.circle(canvas,(bottomx,bottomy),6,(0,0,255),-1)
+
+        self.mid_point = (midx,midy)
+        self.bottom_point = (bottomx,bottomy)
+        self.top_point = (topx,topy)
+        self.leftest_point = (leftx,lefty)
+        self.rightest_point = (rightx,righty)
+
+        return midx,midy
+
+    def visual(self):     # 专门用来可视化操作的成员函数
+        canvas = self.roi 
+
+        topx,topy = self.top_point
+        rightx,righty = self.rightest_point
+        leftx,lefty = self.leftest_point
+        bottomx,bottomy = self.bottom_point
+        midx,midy = self.mid_point
 
         cv.line(canvas,(topx,topy),(leftx,lefty),(0,0,255),4)
         cv.line(canvas,(topx,topy),(rightx,righty),(0,0,255),4)
@@ -160,22 +186,7 @@ class jumpmaster:
         cv.line(canvas,(midx,midy),(bottomx,bottomy),(0,0,255),4)
         cv.line(canvas,(leftx,lefty),(bottomx,bottomy),(0,0,255),4)
         cv.line(canvas,(rightx,righty),(bottomx,bottomy),(0,0,255),4)
-        #cv.imshow('canvas2',canvas)
-        
-        #cv.imshow('canvas2',edges)
-        return r,c
-
-    def visual(self):     # 专门用来可视化操作的成员函数
-        canvas = self.roi 
-        che_x,che_y = self.chess_pos
-        che_w,che_h = self.che_wh
-        box_y,box_x = self.box_pos
-        x3,y3 = self.box3_pos
-        #cv.circle(canvas,(che_x,che_y),6,(0,0,255),-1)
-        #cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(box_x,box_y+50),(0,0,255),5)
-        #consider why change self.roi and the canvas same
-        cv.line(canvas,(che_x+int(che_w/2),che_y+che_h),(x3,y3),(0,0,255),4)
-        #cv.imshow("visual",canvas)
+        cv.imshow("visual",canvas)
         
 
 if __name__ == "__main__":
@@ -191,13 +202,6 @@ if __name__ == "__main__":
         cv.circle(canvas,(c,r+300),6,(255,0,0),-1)
         cv.imshow("canvas",canvas)
         
-        '''
-        edges = cv.Canny(roi,100,200)
-        cv.circle(roi,(c,r),6,(0,0,255),-1)  # why?
-        cv.circle(roi,(c,r+50),6,(0,0,255),-1)
-        cv.imshow("roi",roi)
-        cv.imshow("edge",edges)  
-        '''
         img_indx +=1         
         key_num = cv.waitKey(0)
         if key_num == ord("n"):
