@@ -1,7 +1,3 @@
-'''
-author : liangwei
-
-'''
 import subprocess as sub 
 import shlex 
 import cv2 as cv 
@@ -19,11 +15,10 @@ class Adb:
         sub.call("adb shell screencap -p | sed 's/\r$//' > liang.png",shell = True)
         img = cv.imread("liang.png",1)
         resize = cv.resize(img,(700,900))
+        print("working")
         self.img = resize
+        
         return self.img
-
-    def againtencent(self):
-        pass
 
     def touch(self,che_x,che_y,x,y):
         x1 = np.random.randint(550,600)
@@ -37,6 +32,5 @@ class Adb:
 if __name__ == "__main__":
     adb = Adb()
     adb.screenshot()
-    adb.againtencent()
     cv.waitKey(0)
     cv.destroyAllWindows()

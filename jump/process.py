@@ -160,7 +160,7 @@ class jumpmaster:
         cv.line(canvas,(midx,midy),(bottomx,bottomy),(0,0,255),4)
         cv.line(canvas,(leftx,lefty),(bottomx,bottomy),(0,0,255),4)
         cv.line(canvas,(rightx,righty),(bottomx,bottomy),(0,0,255),4)
-        cv.imshow('canvas2',canvas)
+        #cv.imshow('canvas2',canvas)
         
         #cv.imshow('canvas2',edges)
         return r,c

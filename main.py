@@ -9,12 +9,8 @@ mx = 0
 my = 0
 ratio = 0.5
 
-
-
-
 def mouse_val(event,x,y,flags,param):
     global mx,my,che_x,che_y,ratio
-
     if event == cv.EVENT_LBUTTONDOWN:
         x1 = np.random.randint(550,600)
         y1 = np.random.randint(350,550)
@@ -32,11 +28,10 @@ if __name__ == "__main__":
             che_x,che_y = jmp.findChess(img)
             x,y = jmp.findBox()
             jmp.visual()
-            cv.waitKey(500)
+            cv.waitKey(800)
             adb.touch(che_x,che_y,x,y)
-            
         except TypeError :
             continue 
-        cv.waitKey(800)    
+        cv.waitKey(900)    
         
     cv.destroyAllWindows()
