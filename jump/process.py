@@ -26,7 +26,7 @@ class jumpmaster:
         bin_img = cv.inRange(hsv,lower,upper) # 阈值分割 因棋子颜色在游戏运行中稳定 采用阈值分割 跟踪棋子
         dliate = cv.dilate(bin_img,kernel,iterations = 2) # 膨胀 将图像膨胀 使得棋子头部和下体连在一起 后面的FindContours函数要用
         erode = cv.erode(dliate,kernel,iterations = 1) # 腐蚀 能够消除二值分割时的图像噪点 得到干净的轮廓图像 使用技巧吧这是
-        bin_im,contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE) # 寻找轮廓 如果前面得到干净的二值轮廓 那现在轮廓就只有棋子了
+        contours,hierarchy = cv.findContours(erode,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE) # 寻找轮廓 如果前面得到干净的二值轮廓 那现在轮廓就只有棋子了
         for cnt in contours:
             x,y,w,h = cv.boundingRect(cnt) # 对轮廓分析 得到最大包围矩形信息 长 宽 高等坐标
             area = w*h
