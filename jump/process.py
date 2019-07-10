@@ -89,7 +89,7 @@ class jumpmaster:
         last = 0
         #cv.imshow("self.roi",self.roi)
         edges = cv.Canny(self.roi,100,200)  # Canny 算子提取边缘
-        
+        canvas = self.roi
         che_x,che_y = self.chess_pos  # 根据棋子的boundingRect将它周围的像素点设为0 因为通过观察有时候棋子的位置会超过盒子 造成识别错误
         for s in range(che_y,che_y + 100):
             # find box pointe1 y1
@@ -105,40 +105,55 @@ class jumpmaster:
                     break
             if stop == 1: 
                 break
-        cv.circle(self.roi,(c,r),6,(0,0,255),-1)
+        topx = c
+        topy = r
+        #cv.circle(canvas,(c,r),6,(0,0,255),-1) #测试时用
 
         # o 是数组数据 K是行标
         now = 599
         last = 600  # 两个标志变量 刚开始随便赋值 这两个用来比较上一行和这一行的白点的行标 
-        for rightest_point in range(300-r):          #得到在顶点往下还有多少行
-            for k,o in enumerate(edges[r+rightest_point]): #遍历整个图像 寻找最左点 据观察 盒子的像素点都是一点一点的
+        for leftest_point in range(300-r):          #得到在顶点往下还有多少行
+            for k,o in enumerate(edges[r+leftest_point]): #遍历整个图像 寻找最左点 据观察 盒子的像素点都是一点一点的
                 if o == 255:
                     now = k
                     break  
-            if(now >= last): 
-                cv.circle(self.roi,(k,r+rightest_point),6,(0,0,255),-1)
+            if now >= last: 
+                #cv.circle(canvas,(k,r+leftest_point),6,(0,0,255),-1) # 测试时用
+                leftx = k 
+                lefty = r+leftest_point
                 break
             last = now        
-        cv.imshow('canvas2',self.roi)
-        
-        # box pointe two
-        
-        for q,o in enumerate(edges[r+20][::-1]):
-            if o == 255:
-                cv.circle(self.roi,(700-q,r+20),6,(0,0,255),-1)
+    
+        # the rightest point of box
+        now = 599
+        last = 600
+        for rightest_point in range(300-r):
+            for q,o in enumerate(edges[r+rightest_point][::-1]):
+                if o == 255:
+                    now = q
+                    break 
+            if now >= last:
+                #cv.circle(canvas,(700-q,r+rightest_point),6,(0,0,255),-1) # 测试时用
+                rightx = 700-q
+                righty = r+rightest_point
                 break
-        # 倒序遍历
-        # 可视化操作  需要修改
-        x1 = k 
-        x2 = 700-q
-        x3 = int((x2 - x1)/2)+k
-        y3 = r+45
-        x1 = k
-        y1 = r+20
-        x2 = 700-q
-        y2 = r+20
+            last = now  
+       
+        midx = int((rightx - leftx)/2)+leftx
+        midy = int((righty - lefty)/2)+lefty
 
+        bottomx =   midx
+        bottomy =  (midy-topy)+midy
+        
+        cv.circle(canvas,(topx,topy),6,(0,0,255),-1)
+        cv.circle(canvas,(leftx,lefty),6,(0,0,255),-1)
+        cv.circle(canvas,(rightx,righty),6,(0,0,255),-1)
+        cv.circle(canvas,(midx,midy),6,(0,0,255),-1)
+        cv.circle(canvas,(bottomx,bottomy),6,(0,0,255),-1)
 
+        cv.imshow('canvas2',canvas)
+        
+        '''
         cv.line(self.roi,(c,r),(x1,y1),(0,0,255),4)
         cv.line(self.roi,(c,r),(x2,y2),(0,0,255),4)
         cv.line(self.roi,(x1,y1),(x2,y2),(0,0,255),4)
@@ -147,7 +162,7 @@ class jumpmaster:
         self.box3_pos = x3,y3
         self.box1_pos = k,y1
         self.box2_pos = x2,y2
-        #print("x1:",x1,"x2 :",x2,"mid: ",int((x2-x1)/2)+x1)
+        '''
         #cv.imshow('canvas2',edges)
         return r,c
 
