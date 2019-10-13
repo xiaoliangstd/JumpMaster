@@ -38,9 +38,11 @@ if __name__ == "__main__":
             jmp.visual()
             cv.waitKey(1000)
             adb.touch(che_x,che_y,x,y) 
+            jmp.index+=1
         except TypeError :
             print(TypeError)
             cv.imwrite("error1.png",img)
+            jmp.index+=1
             '''
             cv.imshow("s",erode) # 如果出现错误 在process.py中合适的位置放此语句调试
             cv.waitKey(0)
